@@ -1,0 +1,115 @@
+// bn_affine_2d.sv
+`include "backbone_pkg.sv"
+
+module bn_affine_2d #(
+  parameter int C = 64,
+  parameter int H = 56,
+  parameter int W = 56,
+  parameter bit USE_RELU = 1'b1
+)(
+  input  logic                 clk,
+  input  logic                 rst_n,
+  input  logic                 start,
+  output logic                 done,
+
+  // flatten feature map: [C * H * W]
+  input  backbone_pkg::data_t  fmap_in  [0:C*H*W-1],
+
+  // per-channel BN folded parameters
+  input  backbone_pkg::data_t  scale    [0:C-1],  // Q2.14
+  input  backbone_pkg::data_t  shift    [0:C-1],  // Q2.14
+
+  output backbone_pkg::data_t  fmap_out [0:C*H*W-1]
+);
+  import backbone_pkg::*;
+
+  // ---- FSM ----
+  typedef enum logic [1:0] {
+    IDLE,
+    RUN,
+    DONE
+  } state_t;
+
+  state_t state;
+
+  int c_idx;
+  int h_idx;
+  int w_idx;
+
+  // helper: flatten index
+  function automatic int idx(int c, int h, int w);
+    return c*H*W + h*W + w;
+  endfunction
+
+  // main FSM
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state  <= IDLE;
+      done   <= 1'b0;
+      c_idx  <= 0;
+      h_idx  <= 0;
+      w_idx  <= 0;
+    end else begin
+      case (state)
+        IDLE: begin
+          done <= 1'b0;
+          if (start) begin
+            c_idx <= 0;
+            h_idx <= 0;
+            w_idx <= 0;
+            state <= RUN;
+          end
+        end
+
+        RUN: begin
+          // 取目前 pixel
+          int k = idx(c_idx, h_idx, w_idx);
+
+          data_t x = fmap_in[k];
+          data_t sc = scale[c_idx];
+          data_t sh = shift[c_idx];
+
+          // x * scale (Q2.14 * Q2.14 = Q4.28)
+          acc_t mul = acc_t'(x) * acc_t'(sc);
+
+          // 回到 Q2.14
+          acc_t mul_q = mul >>> FRAC_BITS;
+
+          // + shift (Q2.14)
+          acc_t sum = mul_q + acc_t'(sh);
+
+          data_t y = sat16(sum);
+          if (USE_RELU) begin
+            y = relu(y);
+          end
+
+          fmap_out[k] <= y;
+
+          // update indices
+          if (w_idx < W-1) begin
+            w_idx <= w_idx + 1;
+          end else begin
+            w_idx <= 0;
+            if (h_idx < H-1) begin
+              h_idx <= h_idx + 1;
+            end else begin
+              h_idx <= 0;
+              if (c_idx < C-1) begin
+                c_idx <= c_idx + 1;
+              end else begin
+                state <= DONE;
+              end
+            end
+          end
+        end
+
+        DONE: begin
+          done  <= 1'b1;
+          state <= IDLE;
+        end
+
+      endcase
+    end
+  end
+
+endmodule
