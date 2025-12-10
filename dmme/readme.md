@@ -1,3 +1,4 @@
+# 講解看dmme.docx
 # dmme_nomem
 普通的一個module
 # dmme_divclk
