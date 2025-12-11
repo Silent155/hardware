@@ -275,4 +275,4 @@ ASIC Flow：RTL coding, synthesis, timing report reading, SDF gate-level sim
 
 FPGA Flow：parameterized RTL, BRAM interaction, AXI-Stream style interfaces
 
-Verification：自寫 testbench、waveform debug、pattern-driven testing
+Verification： testbench、waveform debug、pattern-driven testing
