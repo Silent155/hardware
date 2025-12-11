@@ -34,10 +34,10 @@ hardware/
 ├── iclab/              # Course-style digital design lab
 ├── small_ip_practice/  # Small IPs: arbiter, synchronizer, handshake, etc.
 └── README.md
+```
 
-
-3. DMME — Double-Layer MAC Engine (dmme/)
-3.1 功能概述
+## 3. DMME — Double-Layer MAC Engine (dmme/)
+### 3.1 功能概述
 dmme 是一個二層 systolic MAC engine，用於高吞吐量的乘加運算：
 
 64-bit packed input ain1/ain2, bin1/​bin2，內部分拆成多個 16-bit lane
@@ -49,9 +49,8 @@ nzet.v 依 mask 選出前兩個 non-zero element，降低不必要運算
 dmme_ver2.v（dmme_nonmem）把多個 pe 串成二層陣列，輸出 valid_12_out / valid_22_out 與對應的 cout_*
 
 
-3.2 架構圖（RTL-level）
-text
-複製程式碼
+### 3.2 架構圖（RTL-level）
+```text
                   64-bit ain1/ain2, bin1/bin2
                  +----------------------------+
                  |   Mask + NZET selector     |
@@ -67,9 +66,9 @@ text
                 +---------------+-------------------------+
                                 |
        valid_12_out / valid_22_out + cout_12_*, cout_22_* (32-bit)
+```
 
-
-3.3 Testbench & Verification
+### 3.3 Testbench & Verification
 dmme_nonmem_tb.v
 
 產生時脈 / reset / enable / mode（DENDEN, SPADEN）
@@ -81,7 +80,7 @@ tb_mac.v, tb_pe.v, tb.sv
 針對 MAC、單一 PE 做 unit-level 驗證
 
 
-3.4 技能重點
+### 3.4 技能重點
 Systolic array 設計與 PE 模組化
 
 以 mask + nz-first selection 降低無效運算
@@ -91,8 +90,8 @@ Systolic array 設計與 PE 模組化
 可延伸至 DMA / BRAM 寫回（目前在其他專案中實作）
 
 
-4. SDTA — conv1 GEMM Accelerator (SDTA/)
-4.1 功能概述
+## 4. SDTA — conv1 GEMM Accelerator (SDTA/)
+### 4.1 功能概述
 SDTA 目錄是一套卷積第一層（conv1）的 GEMM-based accelerator，包含：
 
 backbone_pkg.sv：定義 DATA_W=16, ACC_W=32，含 sat16 / ReLU helper
@@ -108,8 +107,8 @@ conv1_axi_stream_top.sv + conv1_B_tile_loader.sv + conv1_C_accum_bram.sv：
 多個版本的 GEMM top：gemm_full_notile/, gemm_tile/, gemm_axi/, gemm_8x8x12_tilewd/
 
 
-4.2 conv1 資料流架構
-text
+### 4.2 conv1 資料流架構
+```text
 
 Input fmap (3 x 112 x 112)  +  Weights (64 x 3 x 7 x 7)
                  │
@@ -123,9 +122,9 @@ Input fmap (3 x 112 x 112)  +  Weights (64 x 3 x 7 x 7)
       (optional) conv1_C_accum_bram.sv
                  │
            AXI-Stream / BRAM interface
+```
 
-
-4.3 Testbench & Verification
+### 4.3 Testbench & Verification
 主要 testbench：
 
 tb_conv1_axi_stream_top.sv
@@ -143,7 +142,7 @@ tb_gemm_8x8x12_tiled.sv, tb_gemm_32x48x80_tiled.sv, tb_gemm16x16.sv
 focus 在 systolic core + tiling controller 的功能
 
 
-4.4 技能重點
+### 4.4 技能重點
 將 conv1 映射成 GEMM + systolic array
 
 設計可重用的 backbone_pkg 與 2D systolic core
@@ -153,8 +152,8 @@ focus 在 systolic core + tiling controller 的功能
 以不同 tile 配置做效能 / 資源 trade-off 的實驗基礎
 
 
-5. IC Contest — Cell-Based Design (ic-contest/)
-5.1 2021 University — geofence
+## 5. IC Contest — Cell-Based Design (ic-contest/)
+### 5.1 2021 University — geofence
 geofence.v：
 
 輸入 10-bit X, Y，輸出 is_inside + valid
@@ -168,7 +167,7 @@ geofence_syn.sdf：提供 gate-level timing annotation
 E_ICC2021_prelimily_univ_cell-based.pdf：原始題目與規格
 
 
-5.2 2025 Graduate-Level — CONVEX
+### 5.2 2025 Graduate-Level — CONVEX
 CONVEX.v：
 
 以多點 (x[i], y[i]) 計算 convex/turning 相關運算，內含向量差、cross product 等
@@ -180,13 +179,13 @@ CONVEX_syn.v, CONVEX_syn.sdf：post-synthesis netlist + SDF
 area.log, timing.log, report.txt：面積 / 時序 / 報告
 
 
-5.3 Flow Highlights
+### 5.3 Flow Highlights
 完整 ASIC-style flow：RTL → synthesis → timing → SDF sim
 
 使用計數器 / FSM 實作幾何演算法，處理多點座標與邊界條件
 
 
-6. iclab — Course-style Digital Design (iclab/)
+## 6. iclab — Course-style Digital Design (iclab/)
 目前包含 lab01/SSC.v：
 
 SSC 模組以大量 wire/算術運算處理
@@ -198,14 +197,14 @@ card_num, snack_num, price 等欄位
 適合作為早期 RTL 練習與 combinational / sequential 混合設計示例
 
 
-7. Small IP Practice (small_ip_practice/)
-7.1 Synchronizer
+## 7. Small IP Practice (small_ip_practice/)
+### 7.1 Synchronizer
 2_flop_synchronizer.sv
 
 經典 2-flop CDC synchronizer，附波形與說明註解
 
 
-7.2 Multi-cycle Multiplier
+### 7.2 Multi-cycle Multiplier
 Two_cycle_Multiplier_Unit.sv
 
 mul2cycle：需兩個 cycle 完成的乘法 unit，包含 start / busy / done protocol
@@ -213,13 +212,13 @@ mul2cycle：需兩個 cycle 完成的乘法 unit，包含 start / busy / done pr
 註解中說明 multi-cycle functional unit 背後 timing 與 handshake 概念
 
 
-7.3 Valid/Ready Handshake
+### 7.3 Valid/Ready Handshake
 Valid_Ready_Handshake.sv
 
 範例實作 valid/ready 介面，示範 backpressure 與 pipeline 行為
 
 
-7.4 Round-Robin Arbiters (small_ip_practice/arbiter/)
+### 7.4 Round-Robin Arbiters (small_ip_practice/arbiter/)
 包含多個 round-robin arbiter 實作：
 
 2way_Round_Robin_Arbiter.sv
@@ -246,7 +245,7 @@ req[7:0]
 gnt[7:0] (pipelined output)
 
 
-8. Verification & Timing Mindset
+## 8. Verification & Timing Mindset
 Across the repository：
 
 幾乎每個核心模組都有對應 tb_*.sv 或 *_tb.v（信心 0.95，來源：檔名分布）
@@ -263,7 +262,7 @@ systolic / conv1 部分以不同 tile size 的 TB 驗證架構彈性（信心 0.
 
 之後才進行 timing / area 的取捨與結構優化
 
-9. Skills & Keywords
+## 9. Skills & Keywords
 可直接放在履歷 / LinkedIn 的關鍵字整理：
 
 HDL：Verilog, SystemVerilog
