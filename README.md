@@ -1,9 +1,7 @@
-# hardware
 # hardware — Digital IC & FPGA Accelerator Portfolio
 
 > Collection of my hardware work: from IC contest (cell-based ASIC) to
 > systolic-array FPGA accelerators and classic RTL building blocks.  
-> （信心 0.98，來源：本 repo 目錄結構）
 
 ---
 
@@ -15,14 +13,14 @@ This repository gathers my **digital IC design / FPGA accelerator** projects:
 - GEMM-based **conv1 accelerator** with 2D systolic array and AXI-stream interface  
 - Full **IC Contest** flows (RTL → synthesis reports → SDF gate-level sim)  
 - A set of **interview-style RTL IPs** (synchronizer, arbiter, valid/ready handshake…)  
-（信心 0.95，來源：`dmme/`, `SDTA/`, `ic-contest/`, `small_ip_practice/`）
+
 
 I mainly work with **Verilog/SystemVerilog**, focusing on:
 
 - Clear, timing-friendly RTL structure  
 - Self-checking or scriptable testbenches  
 - Separation between **compute cores** and **IO / control**  
-（信心 0.9，來源：所有 `*.v`, `*.sv`, `tb_*.sv` 檔案）
+
 
 ---
 
@@ -36,7 +34,7 @@ hardware/
 ├── iclab/              # Course-style digital design lab
 ├── small_ip_practice/  # Small IPs: arbiter, synchronizer, handshake, etc.
 └── README.md
-（信心 1.0，來源：repo 目錄）
+
 
 3. DMME — Double-Layer MAC Engine (dmme/)
 3.1 功能概述
@@ -49,7 +47,7 @@ dmme 是一個二層 systolic MAC engine，用於高吞吐量的乘加運算：
 nzet.v 依 mask 選出前兩個 non-zero element，降低不必要運算
 
 dmme_ver2.v（dmme_nonmem）把多個 pe 串成二層陣列，輸出 valid_12_out / valid_22_out 與對應的 cout_*
-（信心 0.95，來源：dmme_ver2.v, pe.v, mac.v, nzet.v）
+
 
 3.2 架構圖（RTL-level）
 text
@@ -69,7 +67,7 @@ text
                 +---------------+-------------------------+
                                 |
        valid_12_out / valid_22_out + cout_12_*, cout_22_* (32-bit)
-（信心 0.9，來源：dmme_ver2.v 中 PE 實例與 valid/cout 命名）
+
 
 3.3 Testbench & Verification
 dmme_nonmem_tb.v
@@ -81,7 +79,7 @@ dmme_nonmem_tb.v
 tb_mac.v, tb_pe.v, tb.sv
 
 針對 MAC、單一 PE 做 unit-level 驗證
-（信心 0.95，來源：dmme_nonmem_tb.v, tb_mac.v, tb_pe.v, tb.sv）
+
 
 3.4 技能重點
 Systolic array 設計與 PE 模組化
@@ -91,7 +89,7 @@ Systolic array 設計與 PE 模組化
 多層 valid pipeline 與輸出對齊（valid_12_out, valid_22_out）
 
 可延伸至 DMA / BRAM 寫回（目前在其他專案中實作）
-（信心 0.85：最後一點屬推測，來源：訊號命名與你既有說明）
+
 
 4. SDTA — conv1 GEMM Accelerator (SDTA/)
 4.1 功能概述
@@ -108,11 +106,11 @@ conv1_axi_stream_top.sv + conv1_B_tile_loader.sv + conv1_C_accum_bram.sv：
 實作 AXI-Stream 介面、tiling loader 與 C accumulation BRAM
 
 多個版本的 GEMM top：gemm_full_notile/, gemm_tile/, gemm_axi/, gemm_8x8x12_tilewd/
-（信心 0.96，來源：各檔案頂端註解與 port 宣告）
+
 
 4.2 conv1 資料流架構
 text
-複製程式碼
+
 Input fmap (3 x 112 x 112)  +  Weights (64 x 3 x 7 x 7)
                  │
                  ▼
@@ -125,7 +123,7 @@ Input fmap (3 x 112 x 112)  +  Weights (64 x 3 x 7 x 7)
       (optional) conv1_C_accum_bram.sv
                  │
            AXI-Stream / BRAM interface
-（信心 0.9，來源：conv1_gemm_top.sv, systolic_array_2d.sv, conv1_C_accum_bram.sv）
+
 
 4.3 Testbench & Verification
 主要 testbench：
@@ -143,7 +141,7 @@ tb_conv1_gemm_top.sv, tb_conv1_small_gemm.sv
 tb_gemm_8x8x12_tiled.sv, tb_gemm_32x48x80_tiled.sv, tb_gemm16x16.sv
 
 focus 在 systolic core + tiling controller 的功能
-（信心 0.96，來源：各 tb_*.sv 檔案）
+
 
 4.4 技能重點
 將 conv1 映射成 GEMM + systolic array
@@ -153,7 +151,7 @@ focus 在 systolic core + tiling controller 的功能
 使用 AXI-Stream 風格介面與 BRAM 累加器
 
 以不同 tile 配置做效能 / 資源 trade-off 的實驗基礎
-（信心 0.9，來源：SDTA/ 架構與命名）
+
 
 5. IC Contest — Cell-Based Design (ic-contest/)
 5.1 2021 University — geofence
@@ -168,7 +166,7 @@ area.log, timing.log：綜合與時序報告
 geofence_syn.sdf：提供 gate-level timing annotation
 
 E_ICC2021_prelimily_univ_cell-based.pdf：原始題目與規格
-（信心 0.96，來源：檔名與 geofence.v 內容）
+
 
 5.2 2025 Graduate-Level — CONVEX
 CONVEX.v：
@@ -180,13 +178,13 @@ CONVEX.v：
 CONVEX_syn.v, CONVEX_syn.sdf：post-synthesis netlist + SDF
 
 area.log, timing.log, report.txt：面積 / 時序 / 報告
-（信心 0.95，來源：CONVEX.v, report.txt）
+
 
 5.3 Flow Highlights
 完整 ASIC-style flow：RTL → synthesis → timing → SDF sim
 
 使用計數器 / FSM 實作幾何演算法，處理多點座標與邊界條件
-（信心 0.9，來源：程式結構與 log）
+
 
 6. iclab — Course-style Digital Design (iclab/)
 目前包含 lab01/SSC.v：
@@ -198,14 +196,14 @@ card_num, snack_num, price 等欄位
 計算多組 total、輸出 out_change / outvalid
 
 適合作為早期 RTL 練習與 combinational / sequential 混合設計示例
-（信心 0.8，部分推測，來源：SSC.v 介面與訊號命名）
+
 
 7. Small IP Practice (small_ip_practice/)
 7.1 Synchronizer
 2_flop_synchronizer.sv
 
 經典 2-flop CDC synchronizer，附波形與說明註解
-（信心 0.98，來源：檔案註解與程式）
+
 
 7.2 Multi-cycle Multiplier
 Two_cycle_Multiplier_Unit.sv
@@ -213,13 +211,13 @@ Two_cycle_Multiplier_Unit.sv
 mul2cycle：需兩個 cycle 完成的乘法 unit，包含 start / busy / done protocol
 
 註解中說明 multi-cycle functional unit 背後 timing 與 handshake 概念
-（信心 0.95，來源：檔案註解）
+
 
 7.3 Valid/Ready Handshake
 Valid_Ready_Handshake.sv
 
 範例實作 valid/ready 介面，示範 backpressure 與 pipeline 行為
-（信心 0.9，來源：檔名與註解）
+
 
 7.4 Round-Robin Arbiters (small_ip_practice/arbiter/)
 包含多個 round-robin arbiter 實作：
@@ -233,11 +231,11 @@ Valid_Ready_Handshake.sv
 Mask-based_N_way_scalable.sv（可擴展 N-way arbiter）
 
 tb_rr8_tree_pipelined.sv + rr8.pdf：對 8-way arbiter 的測試與說明
-（信心 0.97，來源：arbiter 目錄）
+
 
 Arbiter 結構示意圖
 text
-複製程式碼
+
 req[7:0]
    │
    ├─ 4-way RR arbiter (low 4)
@@ -246,7 +244,7 @@ req[7:0]
  2-way top RR arbiter
    ▼
 gnt[7:0] (pipelined output)
-（信心 0.9，來源：8way_Pipelined_Tree_RR_Arbiter.sv）
+
 
 8. Verification & Timing Mindset
 Across the repository：
